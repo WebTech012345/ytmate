@@ -9,15 +9,49 @@
 <body>
     <div class="container">
         <h1>YouTube Video Downloader</h1>
-        <form id="downloadForm" action="download.php" method="POST">
+        <div class="search-box">
             <input type="text" id="youtubeUrl" name="youtubeUrl" placeholder="Enter YouTube URL" required>
-            <select name="format" required>
-                <option value="mp4">MP4</option>
-                <option value="mp3">MP3</option>
-            </select>
-            <button type="submit">Download</button>
-        </form>
+            <button id="searchButton" onclick="fetchVideoInfo()">Search</button>
+        </div>
+        <div id="videoInfo" style="display:none;">
+            <img id="thumbnail" src="" alt="Video Thumbnail">
+            <div id="loading" class="loading"></div>
+            <form id="downloadForm" action="download.php" method="POST">
+                <input type="hidden" id="hiddenYoutubeUrl" name="youtubeUrl">
+                <select name="format" id="format" required>
+                    <option value="mp4">MP4</option>
+                    <option value="mp3">MP3</option>
+                </select>
+                <input type="text" id="fileName" name="fileName" placeholder="Enter file name (optional)">
+                <button type="submit">Download</button>
+            </form>
+        </div>
         <div id="message"></div>
     </div>
+
+    <script>
+        async function fetchVideoInfo() {
+            const youtubeUrl = document.getElementById('youtubeUrl').value;
+            document.getElementById('videoInfo').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            try {
+                const response = await fetch(`fetch_video_info.php?url=${encodeURIComponent(youtubeUrl)}`);
+                const data = await response.json();
+                document.getElementById('loading').style.display = 'none';
+                if (data.title && data.thumbnail) {
+                    document.getElementById('hiddenYoutubeUrl').value = youtubeUrl;
+                    document.getElementById('fileName').value = data.title;
+                    document.getElementById('thumbnail').src = data.thumbnail;
+                    document.getElementById('videoInfo').style.display = 'block';
+                } else {
+                    document.getElementById('message').innerText = 'Error fetching video info';
+                }
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                console.error('Error fetching video info:', error);
+                document.getElementById('message').innerText = 'Error fetching video info';
+            }
+        }
+    </script>
 </body>
 </html>
