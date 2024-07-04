@@ -15,7 +15,7 @@
         </div>
         <div id="videoInfo" style="display:none;">
             <img id="thumbnail" src="" alt="Video Thumbnail">
-            <div id="loading" class="loading"></div>
+            <div id="loading" class="loading" style="display:none;"></div>
             <form id="downloadForm" action="download.php" method="POST">
                 <input type="hidden" id="hiddenYoutubeUrl" name="youtubeUrl">
                 <select name="format" id="format" required>
@@ -34,6 +34,7 @@
             const youtubeUrl = document.getElementById('youtubeUrl').value;
             document.getElementById('videoInfo').style.display = 'none';
             document.getElementById('loading').style.display = 'block';
+            document.getElementById('message').innerText = '';
             try {
                 const response = await fetch(`fetch_video_info.php?url=${encodeURIComponent(youtubeUrl)}`);
                 const data = await response.json();

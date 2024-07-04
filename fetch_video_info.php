@@ -1,7 +1,18 @@
 <?php
 function getYouTubeVideoId($url) {
-    parse_str(parse_url($url, PHP_URL_QUERY), $params);
-    return $params['v'] ?? '';
+    if (preg_match('/youtu\.be\/([^\&\?\/]+)/', $url, $id)) {
+        return $id[1];
+    } elseif (preg_match('/youtube\.com\/watch\?v=([^\&\?\/]+)/', $url, $id)) {
+        return $id[1];
+    } elseif (preg_match('/youtube\.com\/embed\/([^\&\?\/]+)/', $url, $id)) {
+        return $id[1];
+    } elseif (preg_match('/youtube\.com\/v\/([^\&\?\/]+)/', $url, $id)) {
+        return $id[1];
+    } elseif (preg_match('/youtube\.com\/.+\#v=([^&\?\/]+)/', $url, $id)) {
+        return $id[1];
+    } else {
+        return false;
+    }
 }
 
 function getYouTubeVideoInfo($videoId) {
@@ -20,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     $url = $_GET['url'];
     $videoId = getYouTubeVideoId($url);
 
-    if (!empty($videoId)) {
+    if ($videoId) {
         $videoInfo = getYouTubeVideoInfo($videoId);
         echo json_encode(['title' => $videoInfo['title'], 'thumbnail' => $videoInfo['thumbnail_url']]);
     } else {
